@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Monde Anonyme</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <header>
+            <h1>🌍 Chat Global</h1>
+        </header>
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" placeholder="Écrire un message..." /><button>Envoyer</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        var messages = document.getElementById('messages');
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat_message', input.value);
+                input.value = '';
+            }
+        });
+
+        // Réception d'un message utilisateur
+        socket.on('chat_message', function(data) {
+            var item = document.createElement('li');
+            // Affichage : [PAYS] Nom : Message
+            item.innerHTML = `<strong>[${data.country}] ${data.name}</strong>: ${data.text}`;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        // Réception d'un message système (Connexion/Déconnexion)
+        socket.on('system_message', function(msg) {
+            var item = document.createElement('li');
+            item.style.color = "#888";
+            item.style.fontStyle = "italic";
+            item.textContent = msg;
+            messages.appendChild(item);
+        });
+    </script>
+</body>
+</html>
