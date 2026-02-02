@@ -1,0 +1,31 @@
+{
+  "daemon": true,
+  "run": [
+    {
+      "method": "shell.run",
+      "params": {
+        "path": "app",
+        "venv": "venv",
+        "chain": true,
+        "env": {},
+        "input": null,
+        "message": [
+          "{{platform === 'darwin' ? 'python app_mac.py' : 'python app.py'}}"
+        ],
+        "on": [
+          {
+            "event": "/(http:\\/\\/[0-9.:]+)/",
+            "done": true
+          }
+        ]
+      }
+    },
+    {
+      "when": "{{input && input.event && Array.isArray(input.event) && input.event.length > 0}}",
+      "method": "local.set",
+      "params": {
+        "url": "{{input.event[1]}}"
+      }
+    }
+  ]
+}
